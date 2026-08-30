@@ -104,6 +104,14 @@ class ConversationAgent:
                 raise ValueError(
                     "Anthropic API authentication failed. Check your ANTHROPIC_API_KEY."
                 )
+            except anthropic.BadRequestError as e:
+                err_str = str(e)
+                if "credit balance" in err_str.lower():
+                    raise ValueError(
+                        "Your Anthropic API account credit balance is too low ($0). "
+                        "Please purchase credits at https://console.anthropic.com/settings/billing or provide a new ANTHROPIC_API_KEY in .env."
+                    )
+                raise ValueError(f"Anthropic API Bad Request: {err_str}")
             except anthropic.RateLimitError:
                 raise ValueError(
                     "Anthropic API rate limit reached. Please try again in a moment."
